@@ -1,36 +1,69 @@
+import PaginationControls from "@/components/ui/paginationControls";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import React from "react";
-import { Link } from "react-router";
+import { useSearchParams } from "react-router";
+import { usePosts } from "./usePosts";
 
-/**
- * Requirements:
- * 1. Use React Query to fetch posts from https://dummyjson.com/posts
- * 2. Render the posts in a shadcn table component
- *    (docs: https://ui.shadcn.com/docs/components/table)
- */
 const Question1: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("page")) || 1;
+
+  const { data, isLoading, isError } = usePosts({ page, limit: 10 });
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ page: String(newPage) });
+  };
+
+  if (isLoading) return <p>Loading posts...</p>;
+  if (isError) return <p>Failed to load posts</p>;
+
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-extrablack mb-6">Posts Table</h2>
 
-        <p className="text-lg text-gray-800 mb-4">
-          Use React Query to fetch posts from https://dummyjson.com/posts and
-          render the posts in a shadcn table component.
-        </p>
+        <div className="p-6">
+          <h1 className="text-xl font-bold mb-4">Posts</h1>
 
-        <Link
-          to="https://ui.shadcn.com/docs/components/table"
-          className="text-lg text-blue-600 hover:underline mb-4"
-        >
-          shadcn table component documentation
-        </Link>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Body</TableHead>
+                <TableHead>User</TableHead>
+              </TableRow>
+            </TableHeader>
 
-        {/* Expected Implementation: */}
-        <ul className="list-disc list-inside space-y-2 mb-12 block">
-          <li>Create a custom hook to fetch posts data</li>
-          <li>Render the posts in a shadcn table component</li>
-          <li>Truncate the post body to 100 characters</li>
-        </ul>
+            <TableBody>
+              {data?.posts.map((post) => (
+                <TableRow key={post.id}>
+                  <TableCell>{post.id}</TableCell>
+                  <TableCell className="font-medium">{post.title}</TableCell>
+                  <TableCell className="text-muted-foreground max-w-[500px] truncate">
+                    {post.body}
+                  </TableCell>
+                  <TableCell>{post.userId}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <PaginationControls
+            page={page}
+            limit={10}
+            total={data?.total ?? 0}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
     </div>
   );

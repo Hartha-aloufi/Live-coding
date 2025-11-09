@@ -8,6 +8,7 @@ import {
 import Layout from "@/components/layouts/Layout";
 
 import { LiveCoding, Question1, Question2 } from "@/pages";
+import NotFoundPage from "@/pages/NotFound";
 
 /**
  * Application routing configuration
@@ -25,6 +26,8 @@ const AppRoutes: React.FC = () => {
           <Route path="question-01" element={<Question1 />} />
           <Route path="question-02" element={<Question2 />} />
         </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
